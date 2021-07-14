@@ -457,9 +457,9 @@ registerBlockType( 'cgb/block-custom-gutenberg-blocks', {
 Ahora, si ya conocemos la librería de React, se nos hace un poco extraño no tener separados los componentes en diferentes archivos... pero tranquilos ! 
 Podemos hacerlo ( siempre y cuando no utilicemos mayúsculas en el nombre de los archivos .js o .scss )
 
-### La nueva estructura se vería algo así 
+### Nueva estructura 
 
-:file_folder: block
+:file_folder: New Block
  ┣ :file_folder:Block
  ┃ ┗ :page_facing_up:block.js
  ┃ ┗ :page_facing_up:style.scss
@@ -468,7 +468,7 @@ Podemos hacerlo ( siempre y cuando no utilicemos mayúsculas en el nombre de los
  ┃ ┗ :page_facing_up:editor.scss
  ┣ :page_facing_up:index.js
 
-### En cuanto al código lo veríamos de una manera más simple 
+### Código de una manera más simple 
 > Los archivos editor.js y block.js se verían de una manera muy similar, para este ejemplo mostraré solo el componente editor
 
 #### index.js 
@@ -540,8 +540,109 @@ add_filter( 'block_categories', 'my_custom_block_categories', 10, 2 );
 
 Luego dentro de nuestro bloque podemos agregar en la seccion category nuestro slug y listo, así de sencillo tenemos el bloque dentro de una categoría propia.
 
+>Con el if(){...} inicial lo que estamos haciendo es limitar esta categoría a nuestro type de post especifico... en este caso a post que es el default de wordpress. También podemos eliminar esa validación si queremos que esté accesible en todo el sitio
+
 <!-- Inside of src/init.php add array('wp-blocks', 'wp-plugins', 'wp-element', 'wp-edit-post', 'wp-editor', 'wp-data') line 43 -->
 
+# CGB complejos
+
+Cómo vimos anteriormente crear nuestros propios CGB no es algo muy complicado, y con algunas configuraciones podemos tener nuestros CGB funcionando facilmente.
+Ahora llegó el momento de agregar funcionalidades más complejas a los bloques, desde el manejo de información o "states" entre block y editor hasta el manejo de información entre wordpress y nuestros cgb permitiendo modificar o utilizar atributos como las taxonomies, el titulo etc.
+
+### Compose
+[Developer wordpress - Compose](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-compose/#compose)
+
+Compose es en palabras sencillas un HOC (high order component) que contiene varios de ellos en un mismo componente.
+Realiza una composición de funciones "right-to-left" donde a cada invocación se le proporciona el valor que retorna la funcion anterior.
+~~~
+compose(array)(component)
+~~~ 
+Vamos a pasar un array como parámetro de compose que puede estar compuesto por las llamadas a las funciones como `withSelect` y `withDispatch` (las cuales proporcionarán la logica necesaria para manipular datos propios de wordpress y no sólo de nuestro bloque en específico) junto con nuestro componente. 
+Nuestro componente puede tener acceso a las acciones y selectores que nosotros definamos dentro de dicho compose.
+
+
+#### withSelect
+Es un HOC que usamos para pasar datos como "props" desde nuestro almacenamiento de datos seleccionado a nuestro componente.
+<!-- English version -->
+<!-- This is a higher-order component that we use to pass data as props from the selected data store to our component. -->
+
+#### withDispatch
+Es un HOC que usamos para pasar funciones de envío como propiedades desde nuestro almacenamiento de datos seleccionado a nuestro componente.
+<!-- English version -->
+<!-- This is a higher-order component that we use to pass dispatch functions as props from the selected data store to our component. -->
+
+## Leer datos del API de WP en nuestro CGB
+Como vimos anteriormente vamos a necesitar hacer uso de `compose` y el hoc `withSelect`.
+Primeramente vamos a tener que "envolver" nuestro componente en compose y en este caso como vamos a leer y no modificar datos sólo vamos a utilizar `withSelect` quien va a recibir como parametro `select` y dentro del mismo podremos utilizar los metodos que necesitemos del objeto otenido con el metodo select. 
+####Vamos a ver un esto como código para tratar de entenderlo mejor.
+Supongamos que tenemos nuestro componente base `editor.js` donde queremos utilizar el título de nuestro post type como texto a mostrar en un párrafo de nuestro CGB en el editor. 
+
+Editor.js con el componente básico
+~~~
+const Editor = (props) => {
+	return (
+        <p>Add title from post title here : $title</p>
+    );
+}
+
+export default Editor;
+~~~
+
+En este caso vamos a agregar nuestro HOC compose para poder hacernos del dato que necesitamos, modificando ligeramente el nombre de nuestro componente inicial para pasarlo en nuestro compose y retornar el componente Editor a partir de la utilización de compose.
+
+~~~
+const EditorCompose = (props) => {
+	return (
+        <p>Add title from post title here : $title</p>
+    );
+}
+
+const Editor = compose([
+    withSelect((select) => {
+		...
+	}),
+])(EditorCompose)
+
+export default Editor;
+~~~ 
+
+Ahí mismo vemos que hacemos uso de withSelect y le pasamos como parametro la función select que nos va a permitir seleccionar de dónde necesitamos extraer los datos. 
+Ahora miremos un poco más en profundidad este HOC withSelect 
+
+~~~
+withSelect((select) => {
+		const editorSelect = select('core/editor')
+		const title = editorSelect.getEditedPostAttribute("title");
+		return {
+			title
+		};
+	}),
+~~~
+
+En él podemos ver como definimos a dónde vamos a ir a buscar estos datos lo cual nos va a devolver un objeto con diferentes propiedades que nos van a permitir por ejemplo hacer un `get` al current post usando cierto atributo como en este caso. 
+> Podemos definir una constante con nuestro select o hacerlo donde lo requiramos nosotros, eso es a tu preferencia
+
+En este caso estamos yendo a buscar la información al `core/editor` y le estamos pidiendo que nos entregue el valor del atributo "title" `select('core/editor').getCurrentPostAttribute("title")` y lo estamos retornando logrando así tener este atributo como propiedad dentro de nuestro comoponente principal 
+
+~~~
+const EditorCompose = (props) => {
+	return (
+        <p>Add title from post title here : $title</p>
+    );
+}
+
+const Editor = compose([
+    withSelect((select) => {
+		const editorSelect = select('core/editor')
+		const title = editorSelect.getEditedPostAttribute("title");
+		return {
+			title
+		};
+	}),
+])(EditorCompose)
+
+export default Editor;
+~~~
 ### Lista de gutenberg core blocks
 
 ```
@@ -591,7 +692,8 @@ Mi mayor agradecimiento a los creadores de los siguientes contenidos , fueron de
 >[Developer wordpress - Register post type functions](https://developer.wordpress.org/reference/functions/register_post_type/)  
 >[Developer wordpress - Register block type](https://developer.wordpress.org/reference/functions/register_block_type/)
 >[Developer wordpress - Icons ](https://developer.wordpress.org/resource/dashicons/)   
->[Developer wordpress - Components](https://developer.wordpress.org/block-editor/reference-guides/components/)   
+>[Developer wordpress - Components](https://developer.wordpress.org/block-editor/reference-guides/components/) 
+>[Developer wordpress - Compose](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-compose/#compose)   
 >[Wpbeginner - Creating a wordpress plugin](https://www.wpbeginner.com/beginners-guide/what-why-and-how-tos-of-creating-a-site-specific-wordpress-plugin/)  
 >[Wpbeginner - Create a custom post types archive page in wordpress](https://www.wpbeginner.com/wp-tutorials/how-to-create-a-custom-post-types-archive-page-in-wordpress/)   
 >[Wpbeginner - Permalink settings](https://www.wpbeginner.com/wp-tutorials/seo-friendly-url-structure-for-wordpress/)     
