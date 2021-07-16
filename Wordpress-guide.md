@@ -206,7 +206,7 @@ Ahora veremos un sencillo paso a paso sobre cómo vamos a crear rápidamente un 
 
 ### Agregar información adicional en tu cabecera del post
 
-##### ( útil para información importante, links o ayudas)
+> Esto es útil para información importante, links o ayudas
 
 Podemos agregar información adicional en la sección superior de la pestaña de nuestro post type. Cuando entras al post type arriba aparecerá una pestaña desplegable de ayuda y ahí dentro vas a poder agregar contenido que creas útil para el usuario que deba manipular ese post type específico.
 
@@ -227,6 +227,15 @@ add_action('admin_head', function() {
 });
 ```
 
+Si queremos agregar más tabs en nuestra sección de ayuda podemos simplemente crear otros array de argumentos y re declarar la función `add_help_tab` con los nuevos argumentos, una debajo de la otra
+
+~~~
+$args1 = [ ... ]
+$args2 = [ ... ]
+
+$screen->add_help_tab( $args1 );
+$screen->add_help_tab( $args2 );
+~~~
 ### Categorias y etiquetas
 
 Probablemente necesites utilizar etiquetas y/o categorias para mostrar o entrelazar los post types entre si , buscar información y agruparla.  
@@ -237,7 +246,7 @@ El argumento básico será el siguiente :
 'taxonomies' => array( 'post_tag','category' ) // add taxonomies , this enable the box categories and tags to select them
 ```
 
-# Esconder o elimianar default post type
+# Esconder o eliminar un default post type
 
 Llegado a este punto abremos configurado nuestros propios custom post types, y puede que llegado el caso querramos que el usuario final pueda agregar y/o modificar únicamente los nuevos post types que nosotros creamos. Es aquí donde surge la pregunta, puedo eliminar u ocultar el post type por default ? La respuesta es , si.
 Ahora veamos como, ya que vamos a tener que agregar 3 hooks para hacerlo definitivamente.
@@ -748,7 +757,7 @@ export default Editor;
 ```
 
 Como vemos en el ejemplo lo que estamos haciendo es crear una funcion dentro de nuestro `withDispatch` que va a enviar el titulo mediante el dispatch al `core/editor` con su propiedad editPost el nuevo título denuestro post y esta función va a ser accesible como una propiedad de nuestro componente editor.
-
+> Los modulos core , y core/editor son propios de wordpress. Para más información visitar [Developers Wordpress - data](https://developer.wordpress.org/block-editor/reference-guides/data/)
 ### Lista de gutenberg core blocks
 
 ```
@@ -793,10 +802,13 @@ Mi mayor agradecimiento a los creadores de los siguientes contenidos , fueron de
 
 > [Underscores - Create wp base theme](http://underscores.me/)  
 > [Wordpress - Download basic wordpress](https://es-ar.wordpress.org/download/#download-install)  
-> [Developer wordpress - Child theme ](https://developer.wordpress.org/themes/advanced-topics/child-themes/) >[Developer wordpress - Register post type functions](https://developer.wordpress.org/reference/functions/register_post_type/)  
-> [Developer wordpress - Register block type](https://developer.wordpress.org/reference/functions/register_block_type/) >[Developer wordpress - Icons ](https://developer.wordpress.org/resource/dashicons/)  
+> [Developer wordpress - Child theme ](https://developer.wordpress.org/themes/advanced-topics/child-themes/) 
+>[Developer wordpress - Register post type functions](https://developer.wordpress.org/reference/functions/register_post_type/)  
+> [Developer wordpress - Register block type](https://developer.wordpress.org/reference/functions/register_block_type/)
+>[Developer wordpress - Icons ](https://developer.wordpress.org/resource/dashicons/)  
 > [Developer wordpress - Components](https://developer.wordpress.org/block-editor/reference-guides/components/)
-> [Developer wordpress - Compose](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-compose/#compose)  
+> [Developer wordpress - Compose](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-compose/#compose)    
+>[Developers Wordpress - Block editor data](https://developer.wordpress.org/block-editor/reference-guides/data/) 
 > [Wpbeginner - Creating a wordpress plugin](https://www.wpbeginner.com/beginners-guide/what-why-and-how-tos-of-creating-a-site-specific-wordpress-plugin/)  
 > [Wpbeginner - Create a custom post types archive page in wordpress](https://www.wpbeginner.com/wp-tutorials/how-to-create-a-custom-post-types-archive-page-in-wordpress/)  
 > [Wpbeginner - Permalink settings](https://www.wpbeginner.com/wp-tutorials/seo-friendly-url-structure-for-wordpress/)  
