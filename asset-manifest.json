@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/wordpress-guide/static/css/main.7b07b706.chunk.css",
+    "main.js": "/wordpress-guide/static/js/main.e525429d.chunk.js",
+    "main.js.map": "/wordpress-guide/static/js/main.e525429d.chunk.js.map",
+    "runtime-main.js": "/wordpress-guide/static/js/runtime-main.f90f3a04.js",
+    "runtime-main.js.map": "/wordpress-guide/static/js/runtime-main.f90f3a04.js.map",
+    "static/js/2.b8e00ffe.chunk.js": "/wordpress-guide/static/js/2.b8e00ffe.chunk.js",
+    "static/js/2.b8e00ffe.chunk.js.map": "/wordpress-guide/static/js/2.b8e00ffe.chunk.js.map",
+    "static/js/3.85e046fa.chunk.js": "/wordpress-guide/static/js/3.85e046fa.chunk.js",
+    "static/js/3.85e046fa.chunk.js.map": "/wordpress-guide/static/js/3.85e046fa.chunk.js.map",
+    "index.html": "/wordpress-guide/index.html",
+    "static/css/main.7b07b706.chunk.css.map": "/wordpress-guide/static/css/main.7b07b706.chunk.css.map",
+    "static/js/2.b8e00ffe.chunk.js.LICENSE.txt": "/wordpress-guide/static/js/2.b8e00ffe.chunk.js.LICENSE.txt",
+    "static/media/guide.03890ccf.md": "/wordpress-guide/static/media/guide.03890ccf.md"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.f90f3a04.js",
+    "static/js/2.b8e00ffe.chunk.js",
+    "static/css/main.7b07b706.chunk.css",
+    "static/js/main.e525429d.chunk.js"
+  ]
+}
