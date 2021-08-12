@@ -1,58 +1,3 @@
-<!--
-page.php
-
-<?php get_header(); ?>
-
-<main id="primary" class="site-main">
-    <?php
-    while (have_posts()) :
-        the_post();
-        get_template_part('template-parts/content', 'page');
-    endwhile;
-    ?>
-</main>
-
-<?php get_footer();
-
-
-template-parts
-
-<article>
-	<?php the_content(); ?>
-</article>
-
-/\*\*
-
--   Enqueue scripts and styles.
-    \*/
-    function add_page_scripts() {
-    wp_enqueue_style( 'style', get_stylesheet_uri(), array(), \_S_VERSION );
-    wp_style_add_data( 'style', 'rtl', 'replace' );
-
-        wp_enqueue_script( 'navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true );
-        wp_enqueue_script( 'custom-scripts', get_template_directory_uri() . '/js/custom-scripts.js', array(), _S_VERSION, true );
-
-        if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-        	wp_enqueue_script( 'comment-reply' );
-        }
-
-    }
-    add_action( 'wp_enqueue_scripts', 'add_page_scripts' );
-
-/\*\*
-
--   Add type="module" to script.
-    \*/
-    function add_type_to_script($tag, $handle, $source)
-    {
-    if ('neato-custom-scripts' === $handle) {
-    $tag = '<script type="module" src="' . $source . '"></script>';
-    }
-    return $tag;
-    }
-    add_filter('script_loader_tag', 'add_type_to_script', 10, 3);
-
-child theme , para modificar el tema original -->
 
 # Tabla de contenidos
 
@@ -101,10 +46,20 @@ Ahora veremos un sencillo paso a paso sobre cómo vamos a crear rápidamente un 
 
 1.  Descargo wordpress https://es-ar.wordpress.org/download/#download-install
 2.  Corro Xampp e inicio tanto Apache como MySQL
-3.  Dirigirse a http://localhost:8080/wordpress/wp-admin y configurar el admin
+3.  Dirigirse a su sitio local (en mi caso http://localhost/wp-admin ) y configurar el admin
     - Si tengo problemas con la base de datos, puedo ir a /phpmyadmin , hacer un drop y levantarla de nuevo
+    - Por defecto la base de datos se accede con user root y una pass vacía desde nuestro archivo `wp-config.php`
+        ```
+        /** MySQL database username */
+        define( 'DB_USER', 'root' );
+
+        /** MySQL database password */
+        define( 'DB_PASSWORD', '' );
+        ```
 4.  Descargo un tema vacío https://underscores.me/ ( esto nos va a dar la estructura con las carpetas y archivos armados y algunas configuraciones básicas)
     - En cualquier caso y/o momento podemos descargar un tema desarrollado por terceros y utilizarlo sin ningún problema, pudiendo igualmente aplicar contenido de esta guía como creación de plugins y gutemberg blocks.
+    - Vamos a encontrar dentro de la carpeta themes `wp-content/themes` , varias carpetas con los temas que nos otorga wordpress por defecto. Es ahí donde vamos a pegar nuestra nueva carpeta.
+    - El tema debemos seleccionarlo desde el administrador de wordpress en el apartado de apariencia.
 5.  Agregar una carpeta stylesheet dentro del tema\*
 6.  Agregar main.scss dentro de stylesheets\*
 7.  Dentro de main.scss agregar un comentario con la información del tema
@@ -142,6 +97,47 @@ Ahora veremos un sencillo paso a paso sobre cómo vamos a crear rápidamente un 
 
 > Si vamos a utilizar un tema externo y no a crear uno propio , lo mejor es utilizar una carpeta "child-theme" dentro del mismo para hacer nuestras modificaciones y en este caso no vamos a modificar los archivos scss ni css de la carpeta del tema, sino que crearemos unos nuevos dentro de nuestro tema hijo
 
+#### Capturas del administrador
+##### Apariencia
+![cgb-tutorial apariencia temas](/assets/wp-blank-theme.png)    
+    
+##### Información del tema nuevo
+![cgb-tutorial tema información](/assets/wp-blank-theme-data.png)
+
+
+# Crear un custom plugin
+
+<!-- English version -->
+<!-- > A site-specific WordPress plugin is a standalone plugin that you can use to add all customization snippets that are not theme dependent.
+If you add the custom code to your theme’s functions file, then it will disappear if you update or switch your theme. You can create a child theme and use the child theme’s functions file to save your code. However, your code will still disappear if you switch themes. -->
+
+> Un plugin específico de WordPress es un plugin independiente, que podemos utilizar para agregar fragmentos de código y personalización que no van a depender del tema.
+> Si agregamos el código "personalizado" en el archivo functions.php este código desaparecería al cambiar de tema o quizá al actualizar un tema que estamos utilizando.
+> Podemos crear un "child-theme" y usar ese archivo de funciones en el hijo para guardar el código lo que evitaría la pérdida cuando se actualice un tema pero todavía si cambiaramos el mismo por otro estaríamos perdiendo todo este código personalizado
+
+1. Crear una capeta para nuestro nuevo plug-in `my-new-plugin` (podemos usar el nombre que creamos conveniente) dentro de la ruta `wordpress/wp-content/plugins`
+2. Dentro de nuestra nueva carpeta vamos a crear un archivo con extensión `.php` (nuevamente, podés utilizar el nombre que creas conveniente y representativo) para que WordPress reconozca nuestro plugin
+3. En el archivo que hemos creado tenemos que escribir el siguiente código :
+
+    ```
+    <?php
+    /*
+    Plugin Name: Site Plugin for yoursite.com
+    Description: Site specific code changes for yoursite.com
+    */
+    /* Start Adding Functions Below this Line */
+
+    /* Stop Adding Functions Below this Line */
+    ?>
+    ```
+
+4. Activamos el plugin dentro de nuestro administrador de Wordpress
+
+Y así de facil ya tenemos un plugin creado listo para empezar a meterle funcionalidades , en este caso no hará nada ya que nuestro archivo solo tendrá la configuración básica y nada de contenido.
+
+#### Capturas del administrador
+##### Plugins
+![cgb-tutorial plugins](/assets/wp-new-plugin.png)    
 # Crear custom types
 
 #### Consideraciones previas
@@ -198,12 +194,18 @@ Ahora veremos un sencillo paso a paso sobre cómo vamos a crear rápidamente un 
 > Hay muchos argumentos que todavía podemos añadir a nuestro custom post type podemos ver un poco mas de información en : [Developer WordPress - Register post type ](https://developer.wordpress.org/reference/functions/register_post_type/ "see more information")
 
 2. Para definir bloques específicos que queremos que aparezcan en nuestro post type tenemos que definir la propiedad 'template' como un array de bloques que contenga dentro también un array por cada bloque con el nombre y sus propiedades. `'template' => array(array('core/image'))`  
-   2. 1 También podemos colocar varias veces el mismo block `'template' => array(array('core/image', array('core/image') ) `
-3. Bloquear el template de bloques con `'template_lock' =>` 3. 1 `true` bloquearemos el template a la inclusión de nuevos bloques pero no la planilla total por lo que los usuarios podrán moverlos y acomodarlos a gusto 3. 2 `all` bloquearemos el template y sólo se podrá editar el contenido de los bloques pero no podrán agregar nuevos bloques ni acomodarlos 3. 3 `false` el template es un lienzo vacío que puede agregar o eliminar bloques a su gusto
+    1 También podemos colocar varias veces el mismo block `'template' => array(array('core/image', array('core/image') ) `
+3. Bloquear el template de bloques con `'template_lock' =>` 
+    3. 1 `true` bloquearemos el template a la inclusión de nuevos bloques pero no la planilla total por lo que los usuarios podrán moverlos y acomodarlos a gusto 
+    3. 2 `all` bloquearemos el template y sólo se podrá editar el contenido de los bloques pero no podrán agregar nuevos bloques ni acomodarlos 
+    3. 3 `false` el template es un lienzo vacío que puede agregar o eliminar bloques a su gusto
 4. Ahora ya podemos mostrar nuestro nuevo custom post type en el sitio como creamos conveniente (podemos crear templates que carguen todos los types y/o para un single de cada type en nuestro tema custom o simplemente utilizar los que el tema utilizado nos otorgue)
 
 > Si no queremos tener un archivo de este post type debemos setear has_archive => false
 
+#### Capturas del administrador
+##### Custom post type
+![cgb-tutorial custom post type](/assets/wp-movies-custom-post-type.png) 
 ### Agregar información adicional en tu cabecera del post
 
 > Esto es útil para información importante, links o ayudas
@@ -236,6 +238,10 @@ $args2 = [ ... ]
 $screen->add_help_tab( $args1 );
 $screen->add_help_tab( $args2 );
 ~~~
+
+#### Capturas del administrador
+##### Help tab
+![cgb-tutorial custom post type help tab](/assets/wp-movies-help-tab.png) 
 ### Categorias y etiquetas
 
 Probablemente necesites utilizar etiquetas y/o categorias para mostrar o entrelazar los post types entre si , buscar información y agruparla.  
@@ -245,7 +251,40 @@ El argumento básico será el siguiente :
 ```
 'taxonomies' => array( 'post_tag','category' ) // add taxonomies , this enable the box categories and tags to select them
 ```
+Ahora bien, una taxonomía es básicamente la forma que nos da wordpress para poder agrupar nuestro contenido y como mencioné anteriormente podemos crear nuestra propia taxonomía y asignarla a nuestro post type!
+Ahora veamos como : 
 
+```
+function new_taxonomy()
+{
+    register_taxonomy(
+        'movies-category', // name for this taxonomy
+        'movies', // cpt or array of cpt slugs where tax need to be placed
+        array(
+            'labels'            => array(
+                'name'              => 'Movies',
+                'singular_name'     => 'Movie'
+            ),
+            'show-ui'           => true,
+            'show-tag-cloud'    => false,
+            'hierarchical'      => true,
+            'show_in_rest'      => true,
+            'show_admin_column' => true,
+        )
+    );
+};
+add_action('init', 'new_taxonomy');
+```
+Con esta simple función lo que hicimos fue crear una nueva taxonomía para nuestro sitio llamada Movies la cual puede agrupar nuestro nuevo post type o los posts por defecto de wordpres 
+
+> Las taxonomías son accesibles al momento de crear un nuevo cpt , es decir que podemos agregarlo con la propiedad `taxonomies` dentro de nuestro post type. 
+'taxonomies' => array( 'post_tag','category','movies )
+
+>La creación de una taxonomía requiere al menos un post type base donde colocarse, esta función acepta otros argumentos que podemos encontrar en la pagina para desarrolladores de wordpress.
+
+#### Capturas del administrador
+##### Help tab
+![cgb-tutorial custom post type help tab](/assets/wp-new-taxonomy.png) z
 # Esconder o eliminar un default post type
 
 Llegado a este punto abremos configurado nuestros propios custom post types, y puede que llegado el caso querramos que el usuario final pueda agregar y/o modificar únicamente los nuevos post types que nosotros creamos. Es aquí donde surge la pregunta, puedo eliminar u ocultar el post type por default ? La respuesta es , si.
@@ -311,36 +350,6 @@ function remove_draft_widget(){
 ```
 
 > De todas maneras hay que ser conscientes de que esto puede seguir siendo accesible vía url
-
-# Crear un custom plugin
-
-<!-- English version -->
-<!-- > A site-specific WordPress plugin is a standalone plugin that you can use to add all customization snippets that are not theme dependent.
-If you add the custom code to your theme’s functions file, then it will disappear if you update or switch your theme. You can create a child theme and use the child theme’s functions file to save your code. However, your code will still disappear if you switch themes. -->
-
-> Un plugin específico de WordPress es un plugin independiente, que podemos utilizar para agregar fragmentos de código y personalización que no van a depender del tema.
-> Si agregamos el código "personalizado" en el archivo functions.php este código desaparecería al cambiar de tema o quizá al actualizar un tema que estamos utilizando.
-> Podemos crear un "child-theme" y usar ese archivo de funciones en el hijo para guardar el código lo que evitaría la pérdida cuando se actualice un tema pero todavía si cambiaramos el mismo por otro estaríamos perdiendo todo este código personalizado
-
-1. Crear una capeta para nuestro nuevo plug-in "my-new-plugin" (podemos usar el nombre que creamos conveniente) dentro de la ruta "..wordpress/wp-content/plugins"
-2. Dentro de nuestra nueva carpeta vamos a crear un archivo con extensión `.php` (nuevamente, podés utilizar el nombre que creas conveniente y representativo) para que WordPress reconozca nuestro plugin
-3. En el archivo que hemos creado tenemos que escribir el siguiente código :
-
-    ```
-    <?php
-    /*
-    Plugin Name: Site Plugin for yoursite.com
-    Description: Site specific code changes for yoursite.com
-    */
-    /* Start Adding Functions Below this Line */
-
-    /* Stop Adding Functions Below this Line */
-    ?>
-    ```
-
-4. Activamos el plugin dentro de nuestro administrador de Wordpress
-
-Y así de facil ya tenemos un plugin creado listo para empezar a meterle funcionalidades , en este caso no hará nada ya que nuestro archivo solo tendrá la configuración básica y nada de contenido.
 
 # Crear custom templates para tu archivo de custom posts types
 
@@ -808,7 +817,8 @@ Mi mayor agradecimiento a los creadores de los siguientes contenidos , fueron de
 >[Developer wordpress - Icons ](https://developer.wordpress.org/resource/dashicons/)  
 > [Developer wordpress - Components](https://developer.wordpress.org/block-editor/reference-guides/components/)
 > [Developer wordpress - Compose](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-compose/#compose)    
->[Developers Wordpress - Block editor data](https://developer.wordpress.org/block-editor/reference-guides/data/) 
+>[Developers Wordpress - Block editor data](https://developer.wordpress.org/block-editor/reference-guides/data/)
+>[Developers Wordpress - Register taxonomy](https://developer.wordpress.org/reference/functions/register_taxonomy/)    
 > [Wpbeginner - Creating a wordpress plugin](https://www.wpbeginner.com/beginners-guide/what-why-and-how-tos-of-creating-a-site-specific-wordpress-plugin/)  
 > [Wpbeginner - Create a custom post types archive page in wordpress](https://www.wpbeginner.com/wp-tutorials/how-to-create-a-custom-post-types-archive-page-in-wordpress/)  
 > [Wpbeginner - Permalink settings](https://www.wpbeginner.com/wp-tutorials/seo-friendly-url-structure-for-wordpress/)  
@@ -816,3 +826,4 @@ Mi mayor agradecimiento a los creadores de los siguientes contenidos , fueron de
 > [Typerocket - Ultimate guide to custom post types ](https://typerocket.com/ultimate-guide-to-custom-post-types-in-wordpress/)  
 > [Ahmadawais - Create a custom block](https://github.com/ahmadawais/create-guten-block) >[Ahmadawais - Github profile](https://github.com/ahmadawais)
 > [Markdown - Sintax](https://www.markdownguide.org/basic-syntax/)
+> [Kinsta - qué es una taxonomía](https://kinsta.com/es/base-de-conocimiento/que-es-una-taxonomia/)
