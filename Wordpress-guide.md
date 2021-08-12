@@ -283,8 +283,10 @@ Con esta simple función lo que hicimos fue crear una nueva taxonomía para nues
 >La creación de una taxonomía requiere al menos un post type base donde colocarse, esta función acepta otros argumentos que podemos encontrar en la pagina para desarrolladores de wordpress.
 
 #### Capturas del administrador
-##### Help tab
-![cgb-tutorial custom post type help tab](/assets/wp-new-taxonomy.png) z
+##### Custom Taxonomy
+![cgb-tutorial custom post type help tab](/assets/wp-new-taxonomy.png) 
+##### Add Taxonomy
+![cgb-tutorial custom post type help tab](/assets/wp-add-tax-on-post.png)
 # Esconder o eliminar un default post type
 
 Llegado a este punto abremos configurado nuestros propios custom post types, y puede que llegado el caso querramos que el usuario final pueda agregar y/o modificar únicamente los nuevos post types que nosotros creamos. Es aquí donde surge la pregunta, puedo eliminar u ocultar el post type por default ? La respuesta es , si.
