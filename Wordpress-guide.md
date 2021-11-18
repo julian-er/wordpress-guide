@@ -507,7 +507,7 @@ const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.b
 registerBlockType( 'cgb/block-custom-gutenberg-blocks', {
 	title: __( 'custom-gutenberg-blocks - CGB Block' ), // Block title.
 	icon: 'shield', // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
-	category: 'cricut', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
+	category: 'common', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
 	keywords: [
 		__( 'custom-gutenberg-blocks — CGB Block' ),
 		__( 'CGB Example' ),
@@ -562,7 +562,7 @@ Podemos hacerlo ( siempre y cuando no utilicemos mayúsculas en el nombre de los
     registerBlockType( 'cgb/block-cgb', {
         title: __( 'cgb - CGB Block' ),
         icon: 'shield',
-        category: 'cricut',
+        category: 'common',
         keywords: [
             __( 'cgb — CGB Block' ),
             __( 'CGB Example' ),
